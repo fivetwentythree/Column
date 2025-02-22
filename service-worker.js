@@ -1,13 +1,13 @@
 const CACHE_NAME = 'paper-cache-v1';
 const CACHED_URLS = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png',
-    '/icons/apple-touch-icon.png'
+    '.',
+    'index.html',
+    'style.css',
+    'app.js',
+    'manifest.json',
+    'icons/icon-192.png',
+    'icons/icon-512.png',
+    'icons/apple-touch-icon.png'
 ];
 
 // Install event - cache core files

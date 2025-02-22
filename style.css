@@ -61,11 +61,16 @@ input[type="url"]:focus {
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
 button {
     padding: 1rem 2rem;
     font-size: 1.1rem;
     font-weight: 500;
-    background-color: #007AFF;
     color: white;
     border: none;
     border-radius: 12px;
@@ -73,10 +78,24 @@ button {
     transition: all 0.3s ease;
     -webkit-appearance: none;
     appearance: none;
+    flex: 1;
+    max-width: 200px;
 }
 
-button:hover {
+button[type="submit"] {
+    background-color: #007AFF;
+}
+
+button[type="submit"]:hover {
     background-color: #0056b3;
+}
+
+button[type="button"] {
+    background-color: #8E8E93;
+}
+
+button[type="button"]:hover {
+    background-color: #636366;
 }
 
 .error-message {

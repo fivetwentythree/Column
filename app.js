@@ -136,6 +136,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     const form = document.getElementById('url-form');
     const input = document.getElementById('url-input');
     const errorMessage = document.getElementById('error-message');
+    const clearButton = document.getElementById('clear-button');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -150,5 +151,11 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         errorMessage.textContent = '';
         const archiveURL = generateArchiveURL(url);
         window.location.href = archiveURL;
+    });
+
+    clearButton.addEventListener('click', () => {
+        input.value = '';
+        errorMessage.textContent = '';
+        input.focus();
     });
 }

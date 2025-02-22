@@ -51,7 +51,16 @@ const validateURL = (url) => {
             '/author/',
             '/literary/',
             '/bookshelf/',
-            '/novel/'
+            '/novel/',
+            '/content/',
+            '/featured/',
+            '/special/',
+            '/longform/',
+            '/digest/',
+            '/premium/',
+            '/spotlight/',
+            '/indepth/',
+            '/deep-dive/'
         ];
         
         // Check both pathname and search parameters for news patterns
@@ -151,6 +160,32 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         errorMessage.textContent = '';
         const archiveURL = generateArchiveURL(url);
         window.location.href = archiveURL;
+    });
+
+    input.addEventListener('focus', async () => {
+        try {
+            // Check if clipboard API is available
+            if (!navigator.clipboard) {
+                console.warn('Clipboard API not available');
+                return;
+            }
+
+            // Request clipboard read permission
+            const text = await navigator.clipboard.readText();
+            
+            // Only auto-paste if the input is empty and the clipboard content looks like a URL
+            if (!input.value && text.trim().startsWith('http')) {
+                input.value = text.trim();
+                const validation = validateURL(text.trim());
+                if (!validation.isValid) {
+                    errorMessage.textContent = validation.message;
+                } else {
+                    errorMessage.textContent = '';
+                }
+            }
+        } catch (err) {
+            console.warn('Failed to read clipboard:', err);
+        }
     });
 
     clearButton.addEventListener('click', () => {

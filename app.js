@@ -60,6 +60,7 @@ const validateURL = (url) => {
             '/premium/',
             '/spotlight/',
             '/indepth/',
+            '/content/',
             '/deep-dive/'
         ];
         

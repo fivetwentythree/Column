@@ -1,86 +1,8 @@
 // Core functionality for URL validation and archive generation
 const validateURL = (url) => {
     try {
+        // Basic URL validation using URL constructor
         const urlObj = new URL(url);
-        // Check for common news article URL patterns
-        const newsPatterns = [
-            '/news/',
-            '/article/',
-            '/story/',
-            '/blog/',
-            '/opinion/',
-            '/politics/',
-            '/world/',
-            '/business/',
-            '/post/',
-            '/analysis/',
-            '/feature/',
-            '/commentary/',
-            '/tech/',
-            '/science/',
-            '/health/',
-            '/sports/',
-            '/entertainment/',
-            '/culture/',
-            '/lifestyle/',
-            '/economy/',
-            '/finance/',
-            '/environment/',
-            '/education/',
-            '/technology/',
-            '/breaking/',
-            '/latest/',
-            '/headlines/',
-            '/updates/',
-            '/report/',
-            '/investigation/',
-            '/exclusive/',
-            '/interview/',
-            '/press-release/',
-            '/media/',
-            '/global/',
-            '/international/',
-            '/world-news/',
-            '/foreign/',
-            '/books/',
-            '/literature/',
-            '/reviews/',
-            '/reading/',
-            '/library/',
-            '/publishing/',
-            '/author/',
-            '/literary/',
-            '/bookshelf/',
-            '/novel/',
-            '/content/',
-            '/featured/',
-            '/special/',
-            '/longform/',
-            '/digest/',
-            '/premium/',
-            '/spotlight/',
-            '/indepth/',
-            '/content/',
-            '/deep-dive/'
-        ];
-        
-        // Check both pathname and search parameters for news patterns
-        const hasNewsPattern = newsPatterns.some(pattern => 
-            urlObj.pathname.toLowerCase().includes(pattern) ||
-            urlObj.search.toLowerCase().includes(pattern.replace(/\//g, ''))
-        );
-
-        // Additional checks for common news site URL patterns
-        const hasDatePattern = /\/(19|20)\d{2}(\/\d{1,2}){0,2}\//.test(urlObj.pathname) || // Matches date patterns like /2023/12/25/
-                               /\d{4,8}/.test(urlObj.pathname); // Matches numeric IDs commonly used in news URLs
-
-        if (!hasNewsPattern && !hasDatePattern) {
-            return {
-                isValid: false,
-                message: 'URL does not appear to be a news article'
-            };
-        }
-
         return {
             isValid: true,
             message: ''
@@ -102,18 +24,13 @@ const generateArchiveURL = (url) => {
 function runTests() {
     // Test validateURL
     console.assert(
-        validateURL('https://example.com/news/article123').isValid === true,
-        'Valid news URL should pass'
+        validateURL('https://example.com/any/path').isValid === true,
+        'Valid URL should pass'
     );
 
     console.assert(
-        validateURL('https://example.com/article/story456').isValid === true,
-        'Valid article URL should pass'
-    );
-
-    console.assert(
-        validateURL('https://example.com/shop').isValid === false,
-        'Non-news URL should fail'
+        validateURL('https://google.com').isValid === true,
+        'Valid URL should pass'
     );
 
     console.assert(
@@ -122,8 +39,8 @@ function runTests() {
     );
 
     // Test generateArchiveURL
-    const testUrl = 'https://example.com/news/story?id=123';
-    const expectedArchiveUrl = `https://archive.is/${encodeURIComponent(testUrl)}`;
+    const testUrl = 'https://example.com/any/path';
+    const expectedArchiveUrl = `https://archive.is/latest/${encodeURIComponent(testUrl)}`;
     console.assert(
         generateArchiveURL(testUrl) === expectedArchiveUrl,
         'Archive URL should be correctly generated'
@@ -174,8 +91,8 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
             // Request clipboard read permission
             const text = await navigator.clipboard.readText();
             
-            // Only auto-paste if the input is empty and the clipboard content looks like a URL
-            if (!input.value && text.trim().startsWith('http')) {
+            // Only auto-paste if the input is empty
+            if (!input.value) {
                 input.value = text.trim();
                 const validation = validateURL(text.trim());
                 if (!validation.isValid) {

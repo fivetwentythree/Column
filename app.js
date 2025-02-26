@@ -20,6 +20,63 @@ const generateArchiveURL = (url) => {
     return `https://archive.is/latest/${encodeURIComponent(url)}`;
 };
 
+// Function to extract and download article content
+const extractAndDownloadContent = async (archiveURL, originalURL) => {
+    try {
+        // Attempt to fetch the archived page content
+        const response = await fetch(archiveURL, {
+            mode: 'cors',
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch archived content');
+        }
+
+        const html = await response.text();
+        
+        // Create a temporary DOM parser
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Extract main content (this is a basic implementation and might need adjustment)
+        const article = doc.querySelector('article') || 
+                       doc.querySelector('.article-content') || 
+                       doc.querySelector('.content') ||
+                       doc.querySelector('main');
+                       
+        if (!article) {
+            throw new Error('Could not find article content');
+        }
+
+        // Clean up the content
+        const cleanText = article.textContent.trim()
+            .replace(/\s+/g, ' ')
+            .replace(/\n+/g, '\n\n');
+
+        // Create the download
+        const filename = new URL(originalURL).hostname.replace(/\./g, '_') + '_archive.txt';
+        const blob = new Blob([cleanText], { type: 'text/plain' });
+        const downloadUrl = window.URL.createObjectURL(blob);
+        
+        // Create and trigger download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        return true;
+    } catch (error) {
+        console.error('Error extracting content:', error);
+        return false;
+    }
+};
+
 // Unit Tests
 function runTests() {
     // Test validateURL
@@ -77,6 +134,8 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 
         errorMessage.textContent = '';
         const archiveURL = generateArchiveURL(url);
+        
+        // Redirect to archive URL immediately
         window.location.href = archiveURL;
     });
 

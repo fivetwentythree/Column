@@ -20,6 +20,10 @@ const generateArchiveURL = (url) => {
     return `https://archive.is/latest/${encodeURIComponent(url)}`;
 };
 
+
+
+
+
 // Function to extract and download article content
 const extractAndDownloadContent = async (archiveURL, originalURL) => {
     try {
@@ -135,8 +139,39 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         errorMessage.textContent = '';
         const archiveURL = generateArchiveURL(url);
         
-        // Redirect to archive URL immediately
-        window.location.href = archiveURL;
+        // Add a loading indicator
+        errorMessage.textContent = 'Connecting to archive service...';
+        
+        try {
+            // Try to fetch the archive URL to check for rate limiting
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
+            const response = await fetch(archiveURL, { 
+                method: 'HEAD',
+                signal: controller.signal,
+                mode: 'no-cors' // This is needed for cross-origin requests
+            });
+            
+            clearTimeout(timeoutId);
+            
+            // If we get here, the request didn't fail
+            errorMessage.textContent = '';
+            window.location.href = archiveURL;
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                errorMessage.textContent = 'Archive service is taking too long to respond. Redirecting anyway...';
+                setTimeout(() => {
+                    window.location.href = archiveURL;
+                }, 1000);
+            } else {
+                // For other errors, still try to redirect but with a warning
+                errorMessage.textContent = 'Archive service may be busy. Redirecting anyway...';
+                setTimeout(() => {
+                    window.location.href = archiveURL;
+                }, 1000);
+            }
+        }
     });
 
     input.addEventListener('focus', async () => {

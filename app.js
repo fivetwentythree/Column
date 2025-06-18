@@ -20,6 +20,11 @@ const generateArchiveURL = (url) => {
     return `https://archive.is/latest/${encodeURIComponent(url)}`;
 };
 
+const generateReadableURL = (url) => {
+    // r.jina.ai provides a simplified view of the article
+    return `https://r.jina.ai/${url}`;
+};
+
 
 
 
@@ -107,6 +112,12 @@ function runTests() {
         'Archive URL should be correctly generated'
     );
 
+    const expectedReadableUrl = `https://r.jina.ai/${testUrl}`;
+    console.assert(
+        generateReadableURL(testUrl) === expectedReadableUrl,
+        'Readable URL should be correctly generated'
+    );
+
     console.log('All tests completed');
 }
 
@@ -138,6 +149,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 
         errorMessage.textContent = '';
         const archiveURL = generateArchiveURL(url);
+        const readableURL = generateReadableURL(url);
         
         // Add a loading indicator
         errorMessage.textContent = 'Connecting to archive service...';
@@ -146,8 +158,8 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
             // Try to fetch the archive URL to check for rate limiting
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-            
-            const response = await fetch(archiveURL, { 
+
+            const response = await fetch(archiveURL, {
                 method: 'HEAD',
                 signal: controller.signal,
                 mode: 'no-cors' // This is needed for cross-origin requests
@@ -160,17 +172,14 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
             window.location.href = archiveURL;
         } catch (err) {
             if (err.name === 'AbortError') {
-                errorMessage.textContent = 'Archive service is taking too long to respond. Redirecting anyway...';
-                setTimeout(() => {
-                    window.location.href = archiveURL;
-                }, 1000);
+                errorMessage.textContent = 'Archive service timed out. Loading readable version...';
             } else {
-                // For other errors, still try to redirect but with a warning
-                errorMessage.textContent = 'Archive service may be busy. Redirecting anyway...';
-                setTimeout(() => {
-                    window.location.href = archiveURL;
-                }, 1000);
+                errorMessage.textContent = 'Archive service unavailable. Loading readable version...';
             }
+
+            setTimeout(() => {
+                window.location.href = readableURL;
+            }, 1000);
         }
     });
 
